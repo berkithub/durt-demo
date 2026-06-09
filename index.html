@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+<title>DÜRT</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; touch-action: manipulation; }
+:root {
+  --fire:#ff4455;--water:#3d9eff;--earth:#44cc77;--wind:#ffbb33;
+  --bg:#07070f;--panel:#0f0f1e;--panel2:#151526;
+  --border:#1e1e34;--text:#ededf8;--dim:#4a4a66;
+  --durt:#ff1144;--win:#33dd88;--r:12px;
+}
+html,body{height:100%;overflow:hidden;background:var(--bg);}
+body{color:var(--text);font-family:'DM Sans',sans-serif;display:flex;flex-direction:column;max-width:430px;margin:0 auto;height:100dvh;user-select:none;}
+.screen{position:absolute;inset:0;display:flex;flex-direction:column;max-width:430px;margin:0 auto;}
+.screen.hidden{display:none;}
+
+/* START */
+#start-screen{background:var(--bg);align-items:center;justify-content:center;padding:28px 24px 32px;gap:0;}
+.start-logo{font-family:'Bebas Neue',sans-serif;font-size:88px;letter-spacing:10px;color:#fff;line-height:1;margin-bottom:6px;text-shadow:0 0 60px rgba(255,68,85,.4);}
+.start-sub{font-size:13px;color:var(--dim);letter-spacing:2px;text-transform:uppercase;margin-bottom:36px;}
+.rules-box{background:var(--panel);border:1px solid var(--border);border-radius:var(--r);padding:18px 18px 16px;width:100%;margin-bottom:28px;}
+.rules-title{font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--dim);margin-bottom:12px;}
+.rule-row{display:flex;gap:10px;align-items:flex-start;margin-bottom:9px;font-size:13px;line-height:1.4;}
+.rule-row:last-child{margin-bottom:0;}
+.rule-icon{font-size:16px;flex-shrink:0;margin-top:1px;}
+.rule-text{color:#a0a0c0;}
+.rule-text strong{color:var(--text);}
+.diff-row{display:flex;gap:8px;width:100%;margin-bottom:14px;}
+.diff-btn{flex:1;padding:12px 8px;border-radius:10px;border:2px solid var(--border);background:var(--panel);color:var(--dim);font-family:'DM Sans',sans-serif;font-size:12px;font-weight:600;cursor:pointer;letter-spacing:.5px;transition:all .15s;display:flex;flex-direction:column;align-items:center;gap:4px;}
+.diff-btn .diff-icon{font-size:20px;}
+.diff-btn.active{border-color:var(--win);color:var(--win);background:rgba(51,221,136,.08);}
+.start-btn{width:100%;padding:17px;background:#fff;color:#07070f;border:none;border-radius:12px;font-family:'DM Sans',sans-serif;font-size:17px;font-weight:700;cursor:pointer;transition:opacity .1s,transform .1s;}
+.start-btn:active{opacity:.88;transform:scale(.98);}
+
+/* GAME */
+#game-screen{background:var(--bg);}
+.hdr{padding:10px 16px 9px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border);flex-shrink:0;}
+.logo-sm{font-family:'Bebas Neue',sans-serif;font-size:26px;letter-spacing:4px;color:#fff;line-height:1;}
+.status-msg{font-size:12px;color:var(--dim);font-style:italic;}
+.ai-zone{padding:8px 16px;display:flex;align-items:center;justify-content:space-between;background:var(--panel);border-bottom:1px solid var(--border);flex-shrink:0;min-height:58px;}
+.zone-label{font-size:10px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;color:var(--dim);margin-bottom:5px;}
+.ai-backs{display:flex;gap:3px;flex-wrap:wrap;max-width:220px;}
+.ai-back{width:13px;height:18px;background:var(--panel2);border:1px solid var(--border);border-radius:2px;}
+.durt-pip{display:flex;flex-direction:column;align-items:center;gap:1px;}
+.durt-pip-label{font-size:9px;letter-spacing:1px;text-transform:uppercase;color:var(--dim);}
+.durt-num{font-family:'Bebas Neue',sans-serif;font-size:30px;line-height:1;color:var(--durt);transition:transform .15s;}
+.durt-num.zero{color:var(--dim);}
+.durt-num.bump{animation:bump .25s ease-out;}
+@keyframes bump{0%,100%{transform:scale(1)}50%{transform:scale(1.4)}}
+.board{flex:1;padding:7px 10px;display:flex;flex-direction:column;gap:5px;overflow-y:auto;min-height:0;}
+.series-row{background:var(--panel);border-radius:var(--r);border:1px solid var(--border);padding:6px 8px;display:flex;align-items:center;gap:8px;min-height:54px;flex-shrink:0;}
+.series-icon{font-size:18px;width:24px;flex-shrink:0;text-align:center;}
+.series-track{display:flex;gap:3px;overflow-x:auto;flex:1;align-items:center;scrollbar-width:none;padding-bottom:1px;}
+.series-track::-webkit-scrollbar{display:none;}
+.series-closed-msg{font-size:11px;color:var(--dim);font-style:italic;}
+.bc{width:30px;height:42px;border-radius:5px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0;border:1px solid transparent;}
+.bc.pivot{border-width:2px;font-size:13px;}
+.bc.new-card{animation:pop-in .25s cubic-bezier(0.34,1.56,0.64,1);}
+@keyframes pop-in{from{transform:scale(0.3);opacity:0}to{transform:scale(1);opacity:1}}
+.s0{color:var(--fire);background:rgba(255,68,85,.12);border-color:var(--fire)}
+.s1{color:var(--water);background:rgba(61,158,255,.12);border-color:var(--water)}
+.s2{color:var(--earth);background:rgba(68,204,119,.12);border-color:var(--earth)}
+.s3{color:var(--wind);background:rgba(255,187,51,.12);border-color:var(--wind)}
+.tc0{color:var(--fire)}.tc1{color:var(--water)}.tc2{color:var(--earth)}.tc3{color:var(--wind)}
+.player-zone{background:var(--panel);border-top:1px solid var(--border);padding:8px 12px 10px;display:flex;flex-direction:column;gap:8px;flex-shrink:0;}
+.player-row{display:flex;align-items:center;justify-content:space-between;}
+.player-left{display:flex;align-items:center;gap:8px;}
+.turn-dot{width:8px;height:8px;border-radius:50%;background:var(--win);flex-shrink:0;animation:blink 1.1s ease-in-out infinite;}
+.turn-dot.off{background:transparent;animation:none;}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.2}}
+.player-right{display:flex;align-items:center;gap:14px;}
+.durt-btn{background:transparent;border:2px solid var(--durt);color:var(--durt);font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:2px;padding:5px 18px 3px;border-radius:8px;cursor:pointer;transition:background .1s,transform .1s;line-height:1.2;}
+.durt-btn:active{background:rgba(255,17,68,.18);transform:scale(.96);}
+.durt-btn.off{opacity:.2;pointer-events:none;}
+.hand-wrap{display:flex;flex-wrap:wrap;gap:5px;}
+.hc{width:46px;height:66px;border-radius:8px;background:var(--panel2);border:2px solid var(--border);display:flex;flex-direction:column;align-items:center;justify-content:space-between;padding:4px 3px 3px;cursor:pointer;transition:transform .15s,box-shadow .15s,border-color .15s,opacity .15s;}
+.hc .vt{font-size:12px;font-weight:700;align-self:flex-start;line-height:1;}
+.hc .si{font-size:18px;line-height:1;}
+.hc .vb{font-size:12px;font-weight:700;align-self:flex-end;line-height:1;transform:rotate(180deg);}
+.hc.can-play{transform:translateY(-5px);box-shadow:0 4px 16px rgba(255,255,255,.1);border-color:rgba(255,255,255,.35);}
+.hc.can-play:active{transform:translateY(-1px) scale(.96);}
+.hc.no-play{opacity:.28;}
+.hc.off-turn{opacity:.35;pointer-events:none;}
+.hc.dealing{animation:deal-in .3s cubic-bezier(0.34,1.3,0.64,1) both;}
+@keyframes deal-in{from{transform:translateY(40px) scale(.7);opacity:0}to{transform:none;opacity:1}}
+@keyframes flash-red{0%{background:rgba(255,17,68,.22)}100%{background:transparent}}
+.flash{animation:flash-red .5s ease-out;}
+
+/* RESULT */
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.88);display:flex;align-items:center;justify-content:center;z-index:100;padding:20px;backdrop-filter:blur(6px);}
+.overlay.hidden{display:none;}
+.result-box{background:var(--panel);border:1px solid var(--border);border-radius:18px;padding:28px 22px 22px;width:100%;max-width:340px;text-align:center;}
+.result-winner{font-family:'Bebas Neue',sans-serif;font-size:48px;letter-spacing:4px;line-height:1;margin-bottom:2px;}
+.result-finish{font-size:11px;color:var(--dim);margin-bottom:22px;font-style:italic;line-height:1.4;}
+.scores{display:flex;gap:10px;margin-bottom:20px;}
+.score-col{flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;background:var(--bg);border-radius:10px;padding:12px 8px;}
+.score-name{font-size:10px;text-transform:uppercase;letter-spacing:1px;color:var(--dim);}
+.score-val{font-family:'Bebas Neue',sans-serif;font-size:52px;line-height:1;color:var(--durt);}
+.score-val.best{color:var(--win);}
+.score-tag{font-size:10px;font-weight:700;color:var(--win);text-transform:uppercase;letter-spacing:1px;visibility:hidden;}
+.score-tag.show{visibility:visible;}
+.result-btns{display:flex;gap:10px;}
+.btn-primary{flex:1;background:#fff;color:#07070f;border:none;border-radius:10px;padding:15px;font-family:'DM Sans',sans-serif;font-size:15px;font-weight:700;cursor:pointer;transition:opacity .1s;}
+.btn-primary:active{opacity:.85;}
+.btn-secondary{background:transparent;color:var(--dim);border:1px solid var(--border);border-radius:10px;padding:15px 16px;font-family:'DM Sans',sans-serif;font-size:13px;cursor:pointer;}
+</style>
+</head>
+<body>
+
+<!-- START SCREEN -->
+<div class="screen" id="start-screen">
+  <div class="start-logo">DÜRT</div>
+  <div class="start-sub">Strategic Card Game</div>
+  <div class="rules-box">
+    <div class="rules-title">How to play</div>
+    <div class="rule-row"><span class="rule-icon">7️⃣</span><span class="rule-text">Play a <strong>7</strong> to open a new series on the board</span></div>
+    <div class="rule-row"><span class="rule-icon">➡️</span><span class="rule-text">Extend open series one step at a time in either direction</span></div>
+    <div class="rule-row"><span class="rule-icon">🚫</span><span class="rule-text">Can't — or won't — play? Take a <strong>DÜRT</strong> penalty</span></div>
+    <div class="rule-row"><span class="rule-icon">🎯</span><span class="rule-text">End on a <strong>7</strong> → <strong>×2 penalty</strong> for all opponents</span></div>
+    <div class="rule-row"><span class="rule-icon">🏆</span><span class="rule-text"><strong>Fewest DÜRT wins</strong> — strategy beats speed</span></div>
+  </div>
+  <div style="font-size:11px;color:var(--dim);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:10px;align-self:flex-start">AI Difficulty</div>
+  <div class="diff-row">
+    <button class="diff-btn active" id="d-easy" onclick="setDiff('easy')"><span class="diff-icon">🐣</span>Beginner</button>
+    <button class="diff-btn" id="d-medium" onclick="setDiff('medium')"><span class="diff-icon">🦊</span>Medium</button>
+  </div>
+  <button class="start-btn" onclick="startGame()">Deal Cards →</button>
+</div>
+
+<!-- GAME SCREEN -->
+<div class="screen hidden" id="game-screen">
+  <div class="hdr">
+    <div class="logo-sm">DÜRT</div>
+    <div class="status-msg" id="msg">Dealing...</div>
+  </div>
+  <div class="ai-zone" id="ai-zone">
+    <div>
+      <div class="zone-label" id="ai-label">AI · Beginner</div>
+      <div class="ai-backs" id="ai-backs"></div>
+    </div>
+    <div class="durt-pip">
+      <div class="durt-pip-label">DÜRT</div>
+      <div class="durt-num zero" id="ai-durt">0</div>
+    </div>
+  </div>
+  <div class="board" id="board"></div>
+  <div class="player-zone" id="player-zone">
+    <div class="player-row">
+      <div class="player-left">
+        <div class="turn-dot off" id="tdot"></div>
+        <div class="zone-label" style="margin:0">You</div>
+      </div>
+      <div class="player-right">
+        <div class="durt-pip">
+          <div class="durt-pip-label">DÜRT</div>
+          <div class="durt-num zero" id="player-durt">0</div>
+        </div>
+        <button class="durt-btn off" id="durt-btn" onclick="humanDurt()">DÜRT</button>
+      </div>
+    </div>
+    <div class="hand-wrap" id="hand"></div>
+  </div>
+</div>
+
+<!-- RESULT OVERLAY -->
+<div class="overlay hidden" id="overlay">
+  <div class="result-box">
+    <div class="result-winner" id="r-winner"></div>
+    <div class="result-finish" id="r-finish"></div>
+    <div class="scores">
+      <div class="score-col">
+        <div class="score-name">You</div>
+        <div class="score-val" id="r-you">0</div>
+        <div class="score-tag" id="r-you-tag">✓ Winner</div>
+      </div>
+      <div class="score-col">
+        <div class="score-name">AI</div>
+        <div class="score-val" id="r-ai">0</div>
+        <div class="score-tag" id="r-ai-tag">✓ Winner</div>
+      </div>
+    </div>
+    <div class="result-btns">
+      <button class="btn-primary" onclick="startGame()">Play Again</button>
+      <button class="btn-secondary" onclick="goHome()">Menu</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const EMOJI=['🔥','💧','⛰️','💨'];
+const VLABEL=['','A','2','3','4','5','6','7','8','9','10','J','Q','K'];
+let difficulty='easy', G;
+
+function setDiff(d){
+  difficulty=d;
+  document.getElementById('d-easy').className='diff-btn'+(d==='easy'?' active':'');
+  document.getElementById('d-medium').className='diff-btn'+(d==='medium'?' active':'');
+}
+
+function goHome(){
+  document.getElementById('overlay').classList.add('hidden');
+  document.getElementById('game-screen').classList.add('hidden');
+  document.getElementById('start-screen').classList.remove('hidden');
+}
+
+function shuffle(arr){
+  for(let i=arr.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[arr[i],arr[j]]=[arr[j],arr[i]];}
+  return arr;
+}
+
+function startGame(){
+  document.getElementById('overlay').classList.add('hidden');
+  document.getElementById('start-screen').classList.add('hidden');
+  document.getElementById('game-screen').classList.remove('hidden');
+  document.getElementById('ai-label').textContent='AI · '+(difficulty==='easy'?'Beginner':'Medium');
+
+  const sevens=[],nonSevens=[];
+  for(let s=0;s<4;s++) for(let v=1;v<=13;v++) (v===7?sevens:nonSevens).push({s,v});
+  shuffle(nonSevens);
+  const deck=shuffle([...sevens,...nonSevens.slice(0,22)]);
+
+  G={
+    phase:'playing', cur:0,
+    p:[
+      {hand:deck.slice(0,13).map(c=>({...c})),durt:0},
+      {hand:deck.slice(13,26).map(c=>({...c})),durt:0}
+    ],
+    series:Array.from({length:4},()=>({open:false,lo:7,hi:7})),
+    busy:false, lastCard:null
+  };
+  render();
+  setTimeout(()=>{
+    document.querySelectorAll('.hc').forEach((c,i)=>{
+      c.style.animationDelay=`${i*45}ms`;
+      c.classList.add('dealing');
+    });
+  },80);
+}
+
+function canPlay(card){
+  const s=G.series[card.s];
+  if(card.v===7) return !s.open;
+  if(!s.open) return false;
+  return card.v===s.lo-1||card.v===s.hi+1;
+}
+function canPlayOn(card,series){
+  const s=series[card.s];
+  if(card.v===7) return !s.open;
+  if(!s.open) return false;
+  return card.v===s.lo-1||card.v===s.hi+1;
+}
+function playable(hand){return hand.filter(canPlay);}
+
+function checkDeadlock(){
+  if(playable(G.p[0].hand).length===0&&playable(G.p[1].hand).length===0){
+    G.phase='done';
+    G.p[0].durt+=G.p[0].hand.length;
+    G.p[1].durt+=G.p[1].hand.length;
+    const d0=G.p[0].durt,d1=G.p[1].durt;
+    G.winner=d0<=d1?0:1;
+    setTimeout(()=>showResult(false,true),400);
+    return true;
+  }
+  return false;
+}
+
+function applyCard(card,pi){
+  const ser=G.series[card.s];
+  if(card.v===7){ser.open=true;ser.lo=7;ser.hi=7;}
+  else if(card.v===ser.lo-1) ser.lo=card.v;
+  else ser.hi=card.v;
+  const h=G.p[pi].hand;
+  h.splice(h.findIndex(c=>c.s===card.s&&c.v===card.v),1);
+  G.lastCard=card;
+  if(h.length===0){endGame(pi,card);return;}
+  G.cur=1-pi; render();
+  if(G.cur===1) scheduleAI();
+}
+
+function applyDurt(pi){
+  G.p[pi].durt++;
+  flashZone(pi); bumpDurt(pi);
+  G.cur=1-pi;
+  if(checkDeadlock()) return;
+  render();
+  if(G.cur===1) scheduleAI();
+}
+
+function endGame(pi,lastCard){
+  G.phase='done';
+  const mult=lastCard.v===7?2:1;
+  G.p[1-pi].durt+=G.p[1-pi].hand.length*mult;
+  const d0=G.p[0].durt,d1=G.p[1].durt;
+  G.winner=d0<d1?0:d1<d0?1:pi;
+  render();
+  setTimeout(()=>showResult(lastCard.v===7,false),400);
+}
+
+function humanPlay(s,v){
+  if(G.cur!==0||G.phase!=='playing'||G.busy) return;
+  if(!canPlay({s,v})) return;
+  G.busy=true; applyCard({s,v},0); G.busy=false;
+}
+function humanDurt(){
+  if(G.cur!==0||G.phase!=='playing'||G.busy) return;
+  G.busy=true; applyDurt(0); G.busy=false;
+}
+
+function scheduleAI(){
+  if(G.cur!==1||G.phase!=='playing') return;
+  setTimeout(aiTurn,700+Math.random()*700);
+}
+
+function aiTurn(){
+  if(G.cur!==1||G.phase!=='playing') return;
+  const moves=playable(G.p[1].hand);
+  if(!moves.length){applyDurt(1);return;}
+  if(difficulty==='easy'){
+    applyCard(moves[Math.floor(Math.random()*moves.length)],1); return;
+  }
+  // Medium: pick move that maximises own playable - opponent playable
+  let best=null,bestScore=-Infinity;
+  for(const card of moves){
+    const sc=G.series.map(s=>({...s}));
+    const ser=sc[card.s];
+    if(card.v===7){ser.open=true;ser.lo=7;ser.hi=7;}
+    else if(card.v===ser.lo-1) ser.lo=card.v;
+    else ser.hi=card.v;
+    const myHand=G.p[1].hand.filter(c=>!(c.s===card.s&&c.v===card.v));
+    const myNew=myHand.filter(c=>canPlayOn(c,sc)).length;
+    const oppNew=G.p[0].hand.filter(c=>canPlayOn(c,sc)).length;
+    const score=myNew-oppNew;
+    if(score>bestScore){bestScore=score;best=card;}
+  }
+  // Voluntary DÜRT if best move heavily benefits opponent
+  if(bestScore<-2&&G.p[1].durt<=G.p[0].durt){applyDurt(1);}
+  else{applyCard(best||moves[0],1);}
+}
+
+function render(){
+  if(G.phase!=='playing') return;
+  const myTurn=G.cur===0;
+  const plays=playable(G.p[0].hand);
+  const pSet=new Set(plays.map(c=>`${c.s}_${c.v}`));
+
+  const msg=document.getElementById('msg');
+  msg.textContent=!myTurn?'AI is thinking…':plays.length>0?`${plays.length} card${plays.length>1?'s':''} playable — tap to play`:'No moves — tap DÜRT →';
+
+  document.getElementById('tdot').className='turn-dot'+(myTurn?'':' off');
+  document.getElementById('durt-btn').className='durt-btn'+(myTurn?'':' off');
+  document.getElementById('ai-backs').innerHTML=G.p[1].hand.map(()=>'<div class="ai-back"></div>').join('');
+  setDurtDisplay('ai-durt',G.p[1].durt);
+  setDurtDisplay('player-durt',G.p[0].durt);
+
+  document.getElementById('board').innerHTML=G.series.map((ser,si)=>{
+    let inner='';
+    if(!ser.open){inner='<span class="series-closed-msg">Play 7 to open</span>';}
+    else{for(let v=ser.lo;v<=ser.hi;v++){const isNew=G.lastCard&&G.lastCard.s===si&&G.lastCard.v===v;inner+=`<div class="bc s${si}${v===7?' pivot':''}${isNew?' new-card':''}">${VLABEL[v]}</div>`;}}
+    return `<div class="series-row"><div class="series-icon tc${si}">${EMOJI[si]}</div><div class="series-track">${inner}</div></div>`;
+  }).join('');
+
+  if(G.lastCard){const rows=document.querySelectorAll('.series-track');if(rows[G.lastCard.s])rows[G.lastCard.s].scrollLeft=9999;}
+
+  const sorted=[...G.p[0].hand].sort((a,b)=>{
+    const ap=pSet.has(`${a.s}_${a.v}`)?0:1,bp=pSet.has(`${b.s}_${b.v}`)?0:1;
+    if(ap!==bp)return ap-bp;if(a.s!==b.s)return a.s-b.s;return a.v-b.v;
+  });
+  document.getElementById('hand').innerHTML=sorted.map(c=>{
+    const key=`${c.s}_${c.v}`;
+    const cls=!myTurn?'off-turn':pSet.has(key)?'can-play':'no-play';
+    return `<div class="hc tc${c.s} ${cls}" onclick="humanPlay(${c.s},${c.v})"><span class="vt">${VLABEL[c.v]}</span><span class="si">${EMOJI[c.s]}</span><span class="vb">${VLABEL[c.v]}</span></div>`;
+  }).join('');
+}
+
+function setDurtDisplay(id,n){const el=document.getElementById(id);el.textContent=n;el.className='durt-num'+(n===0?' zero':'');}
+
+function flashZone(pi){
+  const el=pi===0?document.getElementById('player-zone'):document.getElementById('ai-zone');
+  el.classList.remove('flash');void el.offsetWidth;el.classList.add('flash');
+}
+function bumpDurt(pi){
+  const el=document.getElementById(pi===0?'player-durt':'ai-durt');
+  el.classList.remove('bump');void el.offsetWidth;el.classList.add('bump');
+}
+
+function showResult(isMultiplied,isDeadlock=false){
+  const youWin=G.winner===0,tied=G.p[0].durt===G.p[1].durt;
+  const d0=G.p[0].durt,d1=G.p[1].durt;
+  document.getElementById('r-winner').textContent=tied?'🤝 TIE':youWin?'🏆 YOU WIN':'AI WINS';
+  document.getElementById('r-winner').style.color=tied?'var(--dim)':youWin?'var(--win)':'var(--durt)';
+  document.getElementById('r-finish').textContent=isDeadlock?'⚠️ Deadlock — no moves left. Game ended early.':isMultiplied?'🎯 Multiplied Finish — last card was a 7 · opponents ×2 DÜRT':'✓ Normal Finish — last card was not a 7 · opponents ×1 DÜRT';
+  document.getElementById('r-you').textContent=d0;
+  document.getElementById('r-ai').textContent=d1;
+  document.getElementById('r-you').className='score-val'+(youWin?' best':'');
+  document.getElementById('r-ai').className='score-val'+(!youWin?' best':'');
+  document.getElementById('r-you-tag').className='score-tag'+(youWin?' show':'');
+  document.getElementById('r-ai-tag').className='score-tag'+(!youWin?' show':'');
+  document.getElementById('overlay').classList.remove('hidden');
+}
+</script>
+</body>
+</html>
