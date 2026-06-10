@@ -47,7 +47,9 @@ body{color:var(--text);font-family:'DM Sans',sans-serif;display:flex;flex-direct
 #game-screen{background:var(--bg);}
 .hdr{padding:10px 16px 9px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border);flex-shrink:0;}
 .logo-sm{font-family:'Bebas Neue',sans-serif;font-size:26px;letter-spacing:4px;color:#fff;line-height:1;}
-.status-msg{font-size:12px;color:var(--dim);font-style:italic;}
+.status-msg{font-size:12px;color:var(--dim);font-style:italic;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.rules-btn{width:24px;height:24px;border-radius:50%;border:1px solid var(--border);background:var(--panel2);color:var(--dim);font-family:'DM Sans',sans-serif;font-size:13px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;line-height:1;}
+.rules-btn:active{transform:scale(.92);}
 .ai-zone{padding:8px 16px;display:flex;align-items:center;justify-content:space-between;background:var(--panel);border-bottom:1px solid var(--border);flex-shrink:0;min-height:58px;}
 .zone-label{font-size:10px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;color:var(--dim);margin-bottom:5px;}
 .ai-backs{display:flex;gap:3px;flex-wrap:wrap;max-width:220px;}
@@ -148,7 +150,10 @@ body{color:var(--text);font-family:'DM Sans',sans-serif;display:flex;flex-direct
 <div class="screen hidden" id="game-screen">
   <div class="hdr">
     <div class="logo-sm">DÜRT</div>
-    <div class="status-msg" id="msg"></div>
+    <div style="display:flex;align-items:center;gap:10px;min-width:0;">
+      <div class="status-msg" id="msg"></div>
+      <button class="rules-btn" id="rules-btn" onclick="openRules()" aria-label="Rules" title="Rules">?</button>
+    </div>
   </div>
   <div class="ai-zone" id="ai-zone">
     <div>
@@ -176,6 +181,19 @@ body{color:var(--text);font-family:'DM Sans',sans-serif;display:flex;flex-direct
       </div>
     </div>
     <div class="hand-wrap" id="hand"></div>
+  </div>
+</div>
+
+<!-- RULES OVERLAY -->
+<div class="overlay hidden" id="rules-overlay">
+  <div class="result-box" style="text-align:left;max-width:360px;">
+    <div class="rules-title" data-i18n="howToPlay" style="font-size:12px;margin-bottom:14px;">How to play</div>
+    <div class="rule-row"><span class="rule-icon">7️⃣</span><span class="rule-text" data-i18n-html="rule1"></span></div>
+    <div class="rule-row"><span class="rule-icon">➡️</span><span class="rule-text" data-i18n-html="rule2"></span></div>
+    <div class="rule-row"><span class="rule-icon">🚫</span><span class="rule-text" data-i18n-html="rule3"></span></div>
+    <div class="rule-row"><span class="rule-icon">🎯</span><span class="rule-text" data-i18n-html="rule4"></span></div>
+    <div class="rule-row"><span class="rule-icon">🏆</span><span class="rule-text" data-i18n-html="rule5"></span></div>
+    <button class="btn-primary" style="margin-top:20px;width:100%;" onclick="closeRules()" data-i18n="gotIt">Got it</button>
   </div>
 </div>
 
@@ -231,7 +249,7 @@ const I18N={
     finishMultiplied:'🎯 Multiplied Finish — last card was a 7 · opponents ×2 DÜRT',
     finishNormal:'✓ Normal Finish — last card was not a 7 · opponents ×1 DÜRT',
     winnerTag:'✓ Winner',
-    playAgain:'Play Again', menu:'Menu'
+    playAgain:'Play Again', menu:'Menu', gotIt:'Got it'
   },
   tr:{
     subtitle:'Stratejik Kart Oyunu',
@@ -254,7 +272,7 @@ const I18N={
     finishMultiplied:"🎯 Katlanmış Bitiş — son kart 7'ydi · rakipler ×2 DÜRT",
     finishNormal:'✓ Normal Bitiş — son kart 7 değildi · rakipler ×1 DÜRT',
     winnerTag:'✓ Kazanan',
-    playAgain:'Tekrar Oyna', menu:'Menü'
+    playAgain:'Tekrar Oyna', menu:'Menü', gotIt:'Anladım'
   }
 };
 let lang = localStorage.getItem('durt_lang')
@@ -291,9 +309,13 @@ function setDiff(d){
 
 function goHome(){
   document.getElementById('overlay').classList.add('hidden');
+  document.getElementById('rules-overlay').classList.add('hidden');
   document.getElementById('game-screen').classList.add('hidden');
   document.getElementById('start-screen').classList.remove('hidden');
 }
+
+function openRules(){ document.getElementById('rules-overlay').classList.remove('hidden'); }
+function closeRules(){ document.getElementById('rules-overlay').classList.add('hidden'); }
 
 function shuffle(arr){
   for(let i=arr.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[arr[i],arr[j]]=[arr[j],arr[i]];}
