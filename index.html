@@ -18,6 +18,13 @@ body{color:var(--text);font-family:'DM Sans',sans-serif;display:flex;flex-direct
 .screen{position:absolute;inset:0;display:flex;flex-direction:column;max-width:430px;margin:0 auto;}
 .screen.hidden{display:none;}
 
+/* LANGUAGE TOGGLE */
+.lang-toggle{position:fixed;top:8px;right:8px;z-index:200;display:flex;gap:4px;}
+.lang-toggle button{background:var(--panel2);border:1px solid var(--border);color:var(--dim);font-family:'DM Sans',sans-serif;font-size:12px;font-weight:700;letter-spacing:.5px;padding:5px 9px;border-radius:8px;cursor:pointer;display:flex;align-items:center;gap:5px;line-height:1;transition:all .12s;}
+.lang-toggle button .flag{font-size:14px;}
+.lang-toggle button.active{border-color:var(--win);color:var(--text);background:rgba(51,221,136,.12);}
+.lang-toggle button:active{transform:scale(.94);}
+
 /* START */
 #start-screen{background:var(--bg);align-items:center;justify-content:center;padding:28px 24px 32px;gap:0;}
 .start-logo{font-family:'Bebas Neue',sans-serif;font-size:88px;letter-spacing:10px;color:#fff;line-height:1;margin-bottom:6px;text-shadow:0 0 60px rgba(255,68,85,.4);}
@@ -111,31 +118,37 @@ body{color:var(--text);font-family:'DM Sans',sans-serif;display:flex;flex-direct
 </head>
 <body>
 
+<!-- LANGUAGE TOGGLE -->
+<div class="lang-toggle">
+  <button id="lang-en" onclick="setLang('en')" title="English"><span class="flag">🇬🇧</span>EN</button>
+  <button id="lang-tr" onclick="setLang('tr')" title="Türkçe"><span class="flag">🇹🇷</span>TR</button>
+</div>
+
 <!-- START SCREEN -->
 <div class="screen" id="start-screen">
   <div class="start-logo">DÜRT</div>
-  <div class="start-sub">Strategic Card Game</div>
+  <div class="start-sub" data-i18n="subtitle">Strategic Card Game</div>
   <div class="rules-box">
-    <div class="rules-title">How to play</div>
-    <div class="rule-row"><span class="rule-icon">7️⃣</span><span class="rule-text">Play a <strong>7</strong> to open a new series on the board</span></div>
-    <div class="rule-row"><span class="rule-icon">➡️</span><span class="rule-text">Extend open series one step at a time in either direction</span></div>
-    <div class="rule-row"><span class="rule-icon">🚫</span><span class="rule-text">Can't — or won't — play? Take a <strong>DÜRT</strong> penalty</span></div>
-    <div class="rule-row"><span class="rule-icon">🎯</span><span class="rule-text">End on a <strong>7</strong> → <strong>×2 penalty</strong> for all opponents</span></div>
-    <div class="rule-row"><span class="rule-icon">🏆</span><span class="rule-text"><strong>Fewest DÜRT wins</strong> — strategy beats speed</span></div>
+    <div class="rules-title" data-i18n="howToPlay">How to play</div>
+    <div class="rule-row"><span class="rule-icon">7️⃣</span><span class="rule-text" data-i18n-html="rule1">Play a <strong>7</strong> to open a new series on the board</span></div>
+    <div class="rule-row"><span class="rule-icon">➡️</span><span class="rule-text" data-i18n-html="rule2">Extend open series one step at a time in either direction</span></div>
+    <div class="rule-row"><span class="rule-icon">🚫</span><span class="rule-text" data-i18n-html="rule3">Can't — or won't — play? Take a <strong>DÜRT</strong> penalty</span></div>
+    <div class="rule-row"><span class="rule-icon">🎯</span><span class="rule-text" data-i18n-html="rule4">End on a <strong>7</strong> → <strong>×2 penalty</strong> for all opponents</span></div>
+    <div class="rule-row"><span class="rule-icon">🏆</span><span class="rule-text" data-i18n-html="rule5"><strong>Fewest DÜRT wins</strong> — strategy beats speed</span></div>
   </div>
-  <div style="font-size:11px;color:var(--dim);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:10px;align-self:flex-start">AI Difficulty</div>
+  <div style="font-size:11px;color:var(--dim);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:10px;align-self:flex-start" data-i18n="aiDifficulty">AI Difficulty</div>
   <div class="diff-row">
-    <button class="diff-btn active" id="d-easy" onclick="setDiff('easy')"><span class="diff-icon">🐣</span>Beginner</button>
-    <button class="diff-btn" id="d-medium" onclick="setDiff('medium')"><span class="diff-icon">🦊</span>Medium</button>
+    <button class="diff-btn active" id="d-easy" onclick="setDiff('easy')"><span class="diff-icon">🐣</span><span data-i18n="beginner">Beginner</span></button>
+    <button class="diff-btn" id="d-medium" onclick="setDiff('medium')"><span class="diff-icon">🦊</span><span data-i18n="medium">Medium</span></button>
   </div>
-  <button class="start-btn" onclick="startGame()">Deal Cards →</button>
+  <button class="start-btn" onclick="startGame()" data-i18n="deal">Deal Cards →</button>
 </div>
 
 <!-- GAME SCREEN -->
 <div class="screen hidden" id="game-screen">
   <div class="hdr">
     <div class="logo-sm">DÜRT</div>
-    <div class="status-msg" id="msg">Dealing...</div>
+    <div class="status-msg" id="msg"></div>
   </div>
   <div class="ai-zone" id="ai-zone">
     <div>
@@ -152,7 +165,7 @@ body{color:var(--text);font-family:'DM Sans',sans-serif;display:flex;flex-direct
     <div class="player-row">
       <div class="player-left">
         <div class="turn-dot off" id="tdot"></div>
-        <div class="zone-label" style="margin:0">You</div>
+        <div class="zone-label" style="margin:0" data-i18n="you">You</div>
       </div>
       <div class="player-right">
         <div class="durt-pip">
@@ -173,19 +186,19 @@ body{color:var(--text);font-family:'DM Sans',sans-serif;display:flex;flex-direct
     <div class="result-finish" id="r-finish"></div>
     <div class="scores">
       <div class="score-col">
-        <div class="score-name">You</div>
+        <div class="score-name" data-i18n="you">You</div>
         <div class="score-val" id="r-you">0</div>
-        <div class="score-tag" id="r-you-tag">✓ Winner</div>
+        <div class="score-tag" id="r-you-tag" data-i18n="winnerTag">✓ Winner</div>
       </div>
       <div class="score-col">
-        <div class="score-name">AI</div>
+        <div class="score-name" data-i18n="aiShort">AI</div>
         <div class="score-val" id="r-ai">0</div>
-        <div class="score-tag" id="r-ai-tag">✓ Winner</div>
+        <div class="score-tag" id="r-ai-tag" data-i18n="winnerTag">✓ Winner</div>
       </div>
     </div>
     <div class="result-btns">
-      <button class="btn-primary" onclick="startGame()">Play Again</button>
-      <button class="btn-secondary" onclick="goHome()">Menu</button>
+      <button class="btn-primary" onclick="startGame()" data-i18n="playAgain">Play Again</button>
+      <button class="btn-secondary" onclick="goHome()" data-i18n="menu">Menu</button>
     </div>
   </div>
 </div>
@@ -195,6 +208,81 @@ const EMOJI=['🔥','💧','⛰️','💨'];
 const VLABEL=['','A','2','3','4','5','6','7','8','9','10','J','Q','K'];
 let difficulty='easy', G;
 
+/* ---------- i18n ---------- */
+const I18N={
+  en:{
+    subtitle:'Strategic Card Game',
+    howToPlay:'How to play',
+    rule1:'Play a <strong>7</strong> to open a new series on the board',
+    rule2:'Extend open series one step at a time in either direction',
+    rule3:"Can't — or won't — play? Take a <strong>DÜRT</strong> penalty",
+    rule4:'End on a <strong>7</strong> → <strong>×2 penalty</strong> for all opponents',
+    rule5:'<strong>Fewest DÜRT wins</strong> — strategy beats speed',
+    aiDifficulty:'AI Difficulty',
+    beginner:'Beginner', medium:'Medium',
+    deal:'Deal Cards →',
+    dealing:'Dealing…',
+    ai:'AI', you:'You', aiShort:'AI',
+    thinking:'AI is thinking…',
+    noMoves:'No moves — tap DÜRT →',
+    playToOpen:'Play 7 to open',
+    tie:'🤝 TIE', youWin:'🏆 YOU WIN', aiWins:'AI WINS',
+    finishDeadlock:'⚠️ Deadlock — no moves left. Game ended early.',
+    finishMultiplied:'🎯 Multiplied Finish — last card was a 7 · opponents ×2 DÜRT',
+    finishNormal:'✓ Normal Finish — last card was not a 7 · opponents ×1 DÜRT',
+    winnerTag:'✓ Winner',
+    playAgain:'Play Again', menu:'Menu'
+  },
+  tr:{
+    subtitle:'Stratejik Kart Oyunu',
+    howToPlay:'Nasıl oynanır',
+    rule1:'Tahtada yeni bir seri açmak için <strong>7</strong> oyna',
+    rule2:'Açık serileri her iki yönde birer adım uzat',
+    rule3:'Oynayamıyor — ya da istemiyor musun? <strong>DÜRT</strong> cezası al',
+    rule4:'<strong>7</strong> ile bitir → tüm rakiplere <strong>×2 ceza</strong>',
+    rule5:'<strong>En az DÜRT kazanır</strong> — strateji hızı yener',
+    aiDifficulty:'Yapay Zekâ Zorluğu',
+    beginner:'Acemi', medium:'Orta',
+    deal:'Kartları Dağıt →',
+    dealing:'Dağıtılıyor…',
+    ai:'YZ', you:'Sen', aiShort:'YZ',
+    thinking:'YZ düşünüyor…',
+    noMoves:"Hamle yok — DÜRT'e dokun →",
+    playToOpen:'Açmak için 7 oyna',
+    tie:'🤝 BERABERE', youWin:'🏆 KAZANDIN', aiWins:'YZ KAZANDI',
+    finishDeadlock:'⚠️ Kilitlenme — hamle kalmadı. Oyun erken bitti.',
+    finishMultiplied:"🎯 Katlanmış Bitiş — son kart 7'ydi · rakipler ×2 DÜRT",
+    finishNormal:'✓ Normal Bitiş — son kart 7 değildi · rakipler ×1 DÜRT',
+    winnerTag:'✓ Kazanan',
+    playAgain:'Tekrar Oyna', menu:'Menü'
+  }
+};
+let lang = localStorage.getItem('durt_lang')
+  || ((navigator.language||'').toLowerCase().indexOf('tr')===0 ? 'tr' : 'en');
+
+function t(key){ return (I18N[lang] && I18N[lang][key]) || I18N.en[key] || key; }
+
+function applyLang(){
+  document.documentElement.lang = lang;
+  document.querySelectorAll('[data-i18n]').forEach(el=>{ el.textContent = t(el.dataset.i18n); });
+  document.querySelectorAll('[data-i18n-html]').forEach(el=>{ el.innerHTML = t(el.dataset.i18nHtml); });
+  document.getElementById('lang-en').classList.toggle('active', lang==='en');
+  document.getElementById('lang-tr').classList.toggle('active', lang==='tr');
+  // refresh dynamic regions if a game is active
+  if(G && G.phase==='playing') render();
+  const ov=document.getElementById('overlay');
+  if(G && G.phase==='done' && !ov.classList.contains('hidden')) showResult(G._mult, G._dead);
+}
+
+function setLang(l){
+  lang=l;
+  try{ localStorage.setItem('durt_lang', l); }catch(e){}
+  applyLang();
+}
+
+function aiLabel(){ return t('ai')+' · '+t(difficulty==='easy'?'beginner':'medium'); }
+
+/* ---------- game ---------- */
 function setDiff(d){
   difficulty=d;
   document.getElementById('d-easy').className='diff-btn'+(d==='easy'?' active':'');
@@ -216,7 +304,7 @@ function startGame(){
   document.getElementById('overlay').classList.add('hidden');
   document.getElementById('start-screen').classList.add('hidden');
   document.getElementById('game-screen').classList.remove('hidden');
-  document.getElementById('ai-label').textContent='AI · '+(difficulty==='easy'?'Beginner':'Medium');
+  document.getElementById('ai-label').textContent=aiLabel();
 
   const sevens=[],nonSevens=[];
   for(let s=0;s<4;s++) for(let v=1;v<=13;v++) (v===7?sevens:nonSevens).push({s,v});
@@ -348,8 +436,12 @@ function render(){
   const pSet=new Set(plays.map(c=>`${c.s}_${c.v}`));
 
   const msg=document.getElementById('msg');
-  msg.textContent=!myTurn?'AI is thinking…':plays.length>0?`${plays.length} card${plays.length>1?'s':''} playable — tap to play`:'No moves — tap DÜRT →';
+  const hint = lang==='tr'
+    ? `${plays.length} oynanabilir kart — oynamak için dokun`
+    : `${plays.length} card${plays.length>1?'s':''} playable — tap to play`;
+  msg.textContent = !myTurn ? t('thinking') : plays.length>0 ? hint : t('noMoves');
 
+  document.getElementById('ai-label').textContent=aiLabel();
   document.getElementById('tdot').className='turn-dot'+(myTurn?'':' off');
   document.getElementById('durt-btn').className='durt-btn'+(myTurn?'':' off');
   document.getElementById('ai-backs').innerHTML=G.p[1].hand.map(()=>'<div class="ai-back"></div>').join('');
@@ -358,7 +450,7 @@ function render(){
 
   document.getElementById('board').innerHTML=G.series.map((ser,si)=>{
     let inner='';
-    if(!ser.open){inner='<span class="series-closed-msg">Play 7 to open</span>';}
+    if(!ser.open){inner=`<span class="series-closed-msg">${t('playToOpen')}</span>`;}
     else{for(let v=ser.lo;v<=ser.hi;v++){const isNew=G.lastCard&&G.lastCard.s===si&&G.lastCard.v===v;inner+=`<div class="bc s${si}${v===7?' pivot':''}${isNew?' new-card':''}">${VLABEL[v]}</div>`;}}
     return `<div class="series-row"><div class="series-icon tc${si}">${EMOJI[si]}</div><div class="series-track">${inner}</div></div>`;
   }).join('');
@@ -388,11 +480,12 @@ function bumpDurt(pi){
 }
 
 function showResult(isMultiplied,isDeadlock=false){
+  if(G){G._mult=isMultiplied;G._dead=isDeadlock;}
   const youWin=G.winner===0,tied=G.p[0].durt===G.p[1].durt;
   const d0=G.p[0].durt,d1=G.p[1].durt;
-  document.getElementById('r-winner').textContent=tied?'🤝 TIE':youWin?'🏆 YOU WIN':'AI WINS';
+  document.getElementById('r-winner').textContent=tied?t('tie'):youWin?t('youWin'):t('aiWins');
   document.getElementById('r-winner').style.color=tied?'var(--dim)':youWin?'var(--win)':'var(--durt)';
-  document.getElementById('r-finish').textContent=isDeadlock?'⚠️ Deadlock — no moves left. Game ended early.':isMultiplied?'🎯 Multiplied Finish — last card was a 7 · opponents ×2 DÜRT':'✓ Normal Finish — last card was not a 7 · opponents ×1 DÜRT';
+  document.getElementById('r-finish').textContent=isDeadlock?t('finishDeadlock'):isMultiplied?t('finishMultiplied'):t('finishNormal');
   document.getElementById('r-you').textContent=d0;
   document.getElementById('r-ai').textContent=d1;
   document.getElementById('r-you').className='score-val'+(youWin?' best':'');
@@ -401,6 +494,9 @@ function showResult(isMultiplied,isDeadlock=false){
   document.getElementById('r-ai-tag').className='score-tag'+(!youWin?' show':'');
   document.getElementById('overlay').classList.remove('hidden');
 }
+
+/* initial language paint */
+applyLang();
 </script>
 </body>
 </html>
